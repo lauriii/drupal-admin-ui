@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Router, Route, Switch } from 'react-router-dom';
+import createBrowserHistory from 'history/createBrowserHistory';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
@@ -24,14 +25,18 @@ const store = createStore(
 );
 sagaMiddleware.run(actions);
 
+const history = createBrowserHistory();
+
 class App extends Component {
   componentDidMount() {
-    window.history.replaceState(null, null, '/');
+    // Allow Drupal redirects to determine the initial path.
+    const search = history.location.search.replace('?q=', '');
+    history.replace(`/${search}`);
   }
   render() {
     return (
       <Provider store={store}>
-        <Router>
+        <Router history={history}>
           <Default>
             <Switch>
               <Route exact path="/" component={Home} />
